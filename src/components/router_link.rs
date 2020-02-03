@@ -8,6 +8,7 @@ use yew::prelude::*;
 
 use super::{Msg, Props};
 use crate::RouterState;
+use cfg_if::cfg_if;
 use yew::virtual_dom::VNode;
 
 /// An anchor tag Component that when clicked, will navigate to the provided route.
@@ -53,27 +54,33 @@ impl<SW: Switch + Clone + 'static, STATE: RouterState> Component for RouterAncho
     }
 
     fn view(&self) -> VNode {
-        use stdweb::web::event::IEvent;
+        cfg_if! {
+            if #[cfg(feature = "std_web")] {
+                use stdweb::web::event::IEvent;
+            } else if #[cfg(feature = "web_sys")] {
+                use web_sys::MouseEvent as ClickEvent;
+            }
+        };
         let route: Route<STATE> = Route::from(self.props.route.clone());
         let target: &str = route.as_str();
         let cb = |x| self.link.callback(x);
 
         html! {
-                    <a
-                        class=self.props.classes.clone(),
-                        onclick=cb(|event: ClickEvent | {
-                            event.prevent_default();
-                            Msg::Clicked
-                        }),
-                        disabled=self.props.disabled,
-                        href=target,
-                    >
-                        {
-                            #[allow(deprecated)]
-                            &self.props.text
-                        }
-                        {self.props.children.iter().collect::<VNode>()}
-                    </a>
+            <a
+                class=self.props.classes.clone(),
+                onclick=cb(|event: ClickEvent| {
+                    event.prevent_default();
+                    Msg::Clicked
+                }),
+                disabled=self.props.disabled,
+                href=target,
+            >
+                {
+                    #[allow(deprecated)]
+                    &self.props.text
                 }
+                {self.props.children.iter().collect::<VNode>()}
+            </a>
+        }
     }
 }
