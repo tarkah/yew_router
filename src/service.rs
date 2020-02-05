@@ -169,7 +169,7 @@ where
         });
         cfg_match! {
             feature = "std_web" => ({
-                self.history.replace_state(state_string, "", Some(route));
+                let _ = self.history.replace_state(state_string, "", Some(route));
             }),
             feature = "web_sys" => ({
                 let _ = self.history.replace_state_with_url(&Value::from_str(&state_string), "", Some(route));

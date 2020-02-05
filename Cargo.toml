@@ -59,7 +59,8 @@ features = [
     'Location',
     'Window',
     'PopStateEvent',
-    'MouseEvent'
+    'MouseEvent',
+    'HtmlLinkElement'
 ]
 
 [workspace]
